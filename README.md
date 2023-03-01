@@ -7,12 +7,13 @@
   - name: varchar
 - SleepLog
   - id: bigint
-  - created_at: datetime
+  - created_at: datetime, index: true
   - wake_up_at: datetime
   - user_id: bigint
 - Followers
   - user_id: bigint
   - follower_id: bigint
+  - idx_user_follower
 
 ## APIs
 
@@ -32,5 +33,5 @@
   - `DELETE /user/followers/:follower_id`
 - Get all sleep logs of followers
   - check if current user follows the target user
-  - seep records over past week, ordered by the length of their sleep
+  - sleep records over past week, ordered by the length of their sleep, combine multiple sleep logs on the same day, determined by date of created_at
   - `GET /user/followers/:follower_id/sleep_logs`
