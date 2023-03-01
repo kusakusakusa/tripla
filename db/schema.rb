@@ -16,9 +16,7 @@ ActiveRecord::Schema[7.0].define(version: 2023_03_01_094429) do
     t.integer "follower_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["follower_id"], name: "index_followings_on_follower_id"
     t.index ["user_id", "follower_id"], name: "index_followings_on_user_id_and_follower_id", unique: true
-    t.index ["user_id"], name: "index_followings_on_user_id"
   end
 
   create_table "sleep_logs", force: :cascade do |t|
