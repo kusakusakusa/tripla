@@ -28,11 +28,11 @@
   - `GET /user/sleep_logs`
 - Follow
   - handle already follow scenario
-  - `POST /user/followings/:follower_id`
+  - `POST /user/followings?follower_id`
 - Unfollow
   - handle already unfollow scenario
-  - `DELETE /user/followings/:follower_id`
-- Get all sleep logs of followers
+  - `DELETE /user/followings/:id`
+- Get all sleep logs of all followers, ranked by length of sleep
   - check if current user follows the target user
   - sleep records over past week, ordered by the length of their sleep, combine multiple sleep logs on the same day, determined by date of created_at
-  - `GET /user/followings/:follower_id/sleep_logs`
+  - `GET /user/followings/sleep_logs`
