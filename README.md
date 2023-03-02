@@ -12,8 +12,8 @@
   - user_id: bigint
 - Followings
   - user_id: bigint
-  - follower_id: bigint
-  - idx_user_follower
+  - friend_id: bigint
+  - idx_user_friend
 
 ## APIs
 
@@ -28,11 +28,11 @@
   - `GET /user/sleep_logs`
 - Follow
   - handle already follow scenario
-  - `POST /user/followings?follower_id`
+  - `POST /user/followings?friend_id`
 - Unfollow
   - handle already unfollow scenario
   - `DELETE /user/followings/:id`
-- Get all sleep logs of all followers, ranked by length of sleep
+- Get all sleep logs of all friends, ranked by length of sleep
   - check if current user follows the target user
   - sleep records over past week, ordered by the length of their sleep, combine multiple sleep logs on the same day, determined by date of created_at
   - `GET /user/followings/sleep_logs`

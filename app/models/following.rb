@@ -1,6 +1,6 @@
 class Following < ApplicationRecord
   belongs_to :user
-  belongs_to :follower, foreign_key: :follower_id, class_name: 'User'
+  belongs_to :friend, foreign_key: :friend_id, class_name: 'User'
 
-  validates :follower_id, comparison: { other_than: :user_id }
+  validates :friend_id, comparison: { other_than: :user_id }
 end

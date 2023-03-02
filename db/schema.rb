@@ -13,10 +13,10 @@
 ActiveRecord::Schema[7.0].define(version: 2023_03_01_094429) do
   create_table "followings", force: :cascade do |t|
     t.integer "user_id", null: false
-    t.integer "follower_id", null: false
+    t.integer "friend_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["user_id", "follower_id"], name: "index_followings_on_user_id_and_follower_id", unique: true
+    t.index ["user_id", "friend_id"], name: "index_followings_on_user_id_and_friend_id", unique: true
   end
 
   create_table "sleep_logs", force: :cascade do |t|
@@ -35,6 +35,6 @@ ActiveRecord::Schema[7.0].define(version: 2023_03_01_094429) do
   end
 
   add_foreign_key "followings", "users"
-  add_foreign_key "followings", "users", column: "follower_id"
+  add_foreign_key "followings", "users", column: "friend_id"
   add_foreign_key "sleep_logs", "users"
 end

@@ -1,6 +1,6 @@
 FactoryBot.define do
   factory :following do
     user
-    follower
+    friend
   end
 end
