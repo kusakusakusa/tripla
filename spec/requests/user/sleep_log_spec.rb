@@ -1,14 +1,16 @@
 require 'rails_helper'
 
 RSpec.describe "User::SleepLogs", type: :request do
-  describe "POST /index" do
-    scenario 'should return error if create multiple times within buffer time'
+  let!(:user) { create(:user) }
 
-    scenario 'should create sleep log if no sleep logs exist'
+  describe "POST /user/sleep_logs" do
+    include_examples 'common POST /user/sleep_logs'
 
-    scenario 'should create sleep log if no unstopped sleep logs exist'
+    describe 'multiple users' do
+      let!(:second_user) { create(:user) }
 
-    scenario 'should stop sleep log if unstopped sleep logs exist'
+      include_examples 'common POST /user/sleep_logs'
+    end
   end
 
   describe "GET /index" do
