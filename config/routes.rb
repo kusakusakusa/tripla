@@ -3,7 +3,7 @@ Rails.application.routes.draw do
 
   # Defines the root path route ("/")
   # root "articles#index"
-  namespace :user do
+  scope '/user', module: 'users', as: :user do
     resources :sleep_logs, only: %i[index create]
     resources :followings, only: %i[create destroy] do
       get :sleep_logs, on: :collection
