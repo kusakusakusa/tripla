@@ -15,7 +15,7 @@ module Users
     end
 
     def index
-      current_user.sleep_logs.order(created_at: :desc)
+      render json: { sleep_logs: current_user.sleep_logs.order(created_at: :desc) }
     end
   end
 end
