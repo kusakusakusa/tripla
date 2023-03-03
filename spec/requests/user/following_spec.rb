@@ -9,40 +9,40 @@ RSpec.describe "User::Followings", type: :request do
     scenario 'should follow friend' do
       post '/user/followings', params: { followings: { friend_id: friend.id } }
       expect(Following.count).to eq 1
-      expect(response_body[:following].id).to eq Following.first.id
+      expect(response_body.following.id).to eq Following.first.id
       expect(user.followings.size).to eq 1
       expect(user.friends.size).to eq 1
 
       post '/user/followings', params: { followings: { friend_id: second_friend.id } }
       expect(Following.count).to eq 2
-      expect(response_body[:following].id).to eq Following.last.id
+      expect(response_body.following.id).to eq Following.last.id
       expect(user.followings.reload.size).to eq 2
       expect(user.friends.reload.size).to eq 2
     end
 
     scenario 'should return error if friend_id not provided' do
       post '/user/followings'
-      expect(response_body[:error]).to eq 'param is missing or the value is empty: followings'
+      expect(response_body.error).to eq 'param is missing or the value is empty: followings'
       post '/user/followings', params: { followings: { something: second_friend.id } }
-      expect(response_body[:error]).to eq "Validation failed: Friend must exist, Friend can't be blank"
+      expect(response_body.error).to eq "Validation failed: Friend must exist, Friend can't be blank"
     end
 
     scenario 'should not follow self' do
       post '/user/followings', params: { followings: { friend_id: user.id } }
-      expect(response_body[:error]).to eq "Validation failed: Friend must be other than #{user.id}"
+      expect(response_body.error).to eq "Validation failed: Friend must be other than #{user.id}"
       expect(Following.count).to eq 0
     end
 
     scenario 'should not follow same person twice, but show success if so' do
       post '/user/followings', params: { followings: { friend_id: friend.id } }
       expect(Following.count).to eq 1
-      expect(response_body[:following].id).to eq Following.first.id
+      expect(response_body.following.id).to eq Following.first.id
       expect(user.followings.size).to eq 1
       expect(user.friends.size).to eq 1
 
       post '/user/followings', params: { followings: { friend_id: friend.id } }
       expect(Following.count).to eq 1
-      expect(response_body[:following].id).to eq Following.first.id
+      expect(response_body.following.id).to eq Following.first.id
       expect(user.followings.size).to eq 1
       expect(user.friends.size).to eq 1
     end
@@ -59,17 +59,17 @@ RSpec.describe "User::Followings", type: :request do
 
     scenario 'should unfollow correct friend' do
       delete "/user/followings/#{following_friend.id}"
-      expect(response_body['following'].id).to eq following_friend.id
+      expect(response_body.following.id).to eq following_friend.id
       expect(user.followings.count).to eq 1
       expect(user.followings.first.friend).to eq second_friend
     end
 
     scenario 'should still show success if following does not exist or invalid' do
       delete "/user/followings/0"
-      expect(response_body['following']).to eq nil
+      expect(response_body.following).to eq nil
 
       delete "/user/followings/#{following_stranger.id}"
-      expect(response_body['following']).to eq nil
+      expect(response_body.following).to eq nil
       expect(user.followings.count).to eq 2
     end
   end

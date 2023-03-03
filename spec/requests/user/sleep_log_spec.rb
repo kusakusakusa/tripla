@@ -21,9 +21,9 @@ RSpec.describe "User::SleepLogs", type: :request do
 
     scenario 'should return current users sleep logs only, starting from the latest' do
       get '/user/sleep_logs'
-      expect(response_body['sleep_logs'].size).to eq 2
-      expect(response_body['sleep_logs'].first.id).to eq sleep_log.id
-      expect(response_body['sleep_logs'].last.id).to eq yesterday_sleep_log.id
+      expect(response_body.sleep_logs.size).to eq 2
+      expect(response_body.sleep_logs.first.id).to eq sleep_log.id
+      expect(response_body.sleep_logs.last.id).to eq yesterday_sleep_log.id
     end
   end
 end
