@@ -84,6 +84,9 @@ GEM
       activesupport (>= 5.0)
     i18n (1.12.0)
       concurrent-ruby (~> 1.0)
+    jbuilder (2.11.5)
+      actionview (>= 5.0.0)
+      activesupport (>= 5.0.0)
     loofah (2.19.1)
       crass (~> 1.0.2)
       nokogiri (>= 1.5.9)
@@ -179,6 +182,7 @@ PLATFORMS
 DEPENDENCIES
   bootsnap
   factory_bot_rails (~> 6.2.0)
+  jbuilder (~> 2.11.5)
   pry (~> 0.14.2)
   puma (~> 5.0)
   rails (~> 7.0.4, >= 7.0.4.2)

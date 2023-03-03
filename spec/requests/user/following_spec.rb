@@ -124,22 +124,20 @@ RSpec.describe "User::Followings", type: :request do
       end
     end
 
-    scenario 'should return sleep_logs of all followers only, ranked by length of sleep in descending order' do
+    scenario 'should return sleep_logs of all friends only, ranked by length of sleep in descending order' do
       get '/user/followings/sleep_logs'
-      expect(response_body.friends_sleep_logs.size).to eq 3
+      expect(response_body.friends.size).to eq 3
 
-      expect(response_body.friends_sleep_logs.first.user.id).to eq more_sleep_friend.id
-
-      sleep_logs = response_body.friends_sleep_logs.first.sleep_logs
-      expect(sleep_logs.map(&:created_at)).to eq sleep_logs.sort_by(&:created_at).reverse.map(&:created_at)
-
-      expect(response_body.friends_sleep_logs[1].user.id).to eq less_sleep_friend.id
-      sleep_logs = response_body.friends_sleep_logs[1].sleep_logs
-      expect(sleep_logs.map(&:created_at)).to eq sleep_logs.sort_by(&:created_at).reverse.map(&:created_at)
-
-      expect(response_body.friends_sleep_logs.last.user.id).to eq inactive_friend.id
-      sleep_logs = response_body.friends_sleep_logs.last.sleep_logs
-      expect(sleep_logs.map(&:created_at)).to eq sleep_logs.sort_by(&:created_at).reverse.map(&:created_at)
+      [
+        more_sleep_friend,
+        less_sleep_friend,
+        inactive_friend
+      ].each_with_index do |friend, index|
+        friend_json = response_body.friends[index]
+        expect(friend_json.id).to eq friend.id
+        sleep_logs = friend_json.sleep_logs
+        expect(sleep_logs.map(&:created_at)).to eq sleep_logs.sort_by(&:created_at).reverse.map(&:created_at)
+      end
     end
   end
 end
