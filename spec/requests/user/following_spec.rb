@@ -4,6 +4,7 @@ RSpec.describe "User::Followings", type: :request do
   let!(:user) { create(:user) }
   let!(:friend) { create(:user) }
   let!(:second_friend) { create(:user) }
+  let(:third_friend) { create(:user) }
 
   describe 'POST /user/followings?friend_id' do
     scenario 'should follow friend' do
@@ -75,8 +76,70 @@ RSpec.describe "User::Followings", type: :request do
   end
 
   describe 'GET /user/followings/sleep_logs' do
-    scenario 'should return sleep_logs of all followers only, ranked by length of sleep in descending order' do
+    let!(:less_sleep_friend) { friend }
+    let!(:more_sleep_friend) { second_friend }
+    let!(:inactive_friend) { third_friend }
+    let!(:following_less_sleep_friend) { create(:following, friend: less_sleep_friend, user:) }
+    let!(:following_more_sleep_friend) { create(:following, friend: more_sleep_friend, user:) }
+    let!(:following_third_friend) { create(:following, friend: inactive_friend, user:) }
 
+    let!(:following_stranger) { create(:following) }
+
+    before :each do
+      (21.days.ago.to_date..Date.today).to_a.each do |date|
+        create(
+          :sleep_log,
+          user:,
+          created_at: date.to_time - rand(0..4).hours,
+          wake_up_at: date.to_time + rand(8..12).hours
+        )
+        little_sleep_hours = rand(4..6).hours
+        create(
+          :sleep_log,
+          user: less_sleep_friend,
+          created_at: date.to_time - rand(0..2).hours,
+          wake_up_at: date.to_time + little_sleep_hours
+        )
+        much_sleep_hours = rand(8..12).hours
+        create(
+          :sleep_log,
+          user: more_sleep_friend,
+          created_at: date.to_time - rand(0..2).hours,
+          wake_up_at: date.to_time + much_sleep_hours
+        )
+        unless date.on_weekend?
+          create(
+            :sleep_log,
+            user: inactive_friend,
+            created_at: date.to_time,
+            wake_up_at: date.to_time + 4.hours # ensure less than less_sleep_friend
+          )
+        end
+        create(
+          :sleep_log,
+          user: following_stranger.user,
+          created_at: date.to_time - rand(0..4).hours,
+          wake_up_at: date.to_time + rand(8..12).hours
+        )
+      end
+    end
+
+    scenario 'should return sleep_logs of all followers only, ranked by length of sleep in descending order' do
+      get '/user/followings/sleep_logs'
+      expect(response_body.friends_sleep_logs.size).to eq 3
+
+      expect(response_body.friends_sleep_logs.first.user.id).to eq more_sleep_friend.id
+
+      sleep_logs = response_body.friends_sleep_logs.first.sleep_logs
+      expect(sleep_logs.map(&:created_at)).to eq sleep_logs.sort_by(&:created_at).reverse.map(&:created_at)
+
+      expect(response_body.friends_sleep_logs[1].user.id).to eq less_sleep_friend.id
+      sleep_logs = response_body.friends_sleep_logs[1].sleep_logs
+      expect(sleep_logs.map(&:created_at)).to eq sleep_logs.sort_by(&:created_at).reverse.map(&:created_at)
+
+      expect(response_body.friends_sleep_logs.last.user.id).to eq inactive_friend.id
+      sleep_logs = response_body.friends_sleep_logs.last.sleep_logs
+      expect(sleep_logs.map(&:created_at)).to eq sleep_logs.sort_by(&:created_at).reverse.map(&:created_at)
     end
   end
 end

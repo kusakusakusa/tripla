@@ -13,6 +13,22 @@ module Users
       render json: { following: }
     end
 
+    def sleep_logs
+      friends_hash = current_user.friends.group_by(&:id)
+      logs = SleepLog.where(user: current_user.friends, created_at: 1.week.ago..).order(created_at: :desc).group_by do |sleep_log|
+        sleep_log.user_id
+      end
+
+      render json: {
+        friends_sleep_logs: current_user.friends_rankings.map do |user_id|
+          {
+            user: friends_hash[user_id].first,
+            sleep_logs: logs[user_id]
+          }
+        end
+      }
+    end
+
     private
 
     def following_params
