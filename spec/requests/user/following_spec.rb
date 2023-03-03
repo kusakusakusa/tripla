@@ -4,7 +4,6 @@ RSpec.describe "User::Followings", type: :request do
   let!(:user) { create(:user) }
   let!(:friend) { create(:user) }
   let!(:second_friend) { create(:user) }
-  let!(:stranger) { create(:user) }
 
   describe 'POST /user/followings?friend_id' do
     scenario 'should follow friend' do
@@ -36,19 +35,48 @@ RSpec.describe "User::Followings", type: :request do
 
     scenario 'should not follow same person twice, but show success if so' do
       post '/user/followings', params: { followings: { friend_id: friend.id } }
+      expect(Following.count).to eq 1
+      expect(response_body[:following].id).to eq Following.first.id
       expect(user.followings.size).to eq 1
       expect(user.friends.size).to eq 1
+
       post '/user/followings', params: { followings: { friend_id: friend.id } }
+      expect(Following.count).to eq 1
+      expect(response_body[:following].id).to eq Following.first.id
       expect(user.followings.size).to eq 1
       expect(user.friends.size).to eq 1
     end
   end
 
   describe 'DELETE /user/followings/:id' do
-    scenario 'should unfollow user'
+    let!(:following_friend) { create(:following, friend:, user:) }
+    let!(:following_second_friend) { create(:following, friend: second_friend, user:) }
+    let!(:following_stranger) { create(:following) }
+
+    before :each do
+      expect(user.followings.count).to eq 2
+    end
+
+    scenario 'should unfollow correct friend' do
+      delete "/user/followings/#{following_friend.id}"
+      expect(response_body['following'].id).to eq following_friend.id
+      expect(user.followings.count).to eq 1
+      expect(user.followings.first.friend).to eq second_friend
+    end
+
+    scenario 'should still show success if following does not exist or invalid' do
+      delete "/user/followings/0"
+      expect(response_body['following']).to eq nil
+
+      delete "/user/followings/#{following_stranger.id}"
+      expect(response_body['following']).to eq nil
+      expect(user.followings.count).to eq 2
+    end
   end
 
   describe 'GET /user/followings/sleep_logs' do
-    scenario 'should return sleep_logs of all followers only, ranked by length of sleep in descending order'
+    scenario 'should return sleep_logs of all followers only, ranked by length of sleep in descending order' do
+
+    end
   end
 end

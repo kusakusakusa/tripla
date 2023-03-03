@@ -5,6 +5,14 @@ module Users
       render json: { following: }
     end
 
+    def destroy
+      following = current_user.followings.find(params[:id])
+      following.destroy!
+      render json: { following: }
+    rescue ActiveRecord::RecordNotFound
+      render json: { following: }
+    end
+
     private
 
     def following_params
