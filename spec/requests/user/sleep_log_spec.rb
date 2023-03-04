@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe "User::SleepLogs", type: :request do
+RSpec.describe "Users::SleepLogs", type: :request do
   let!(:user) { create(:user) }
 
   describe "POST /user/sleep_logs" do

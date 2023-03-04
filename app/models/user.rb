@@ -5,6 +5,7 @@ class User < ApplicationRecord
   has_many :sleep_logs
 
   def friends_rankings
+    friends_ids = friends.ids.join(',')
     ActiveRecord::Base.connection.execute("
       SELECT
         sleep_logs.user_id,
@@ -12,7 +13,7 @@ class User < ApplicationRecord
           JULIANDAY(sleep_logs.wake_up_at) - JULIANDAY(sleep_logs.created_at)
         ) AS duration
       FROM sleep_logs
-      WHERE sleep_logs.user_id IN (#{friends.ids.join(',')})
+      WHERE sleep_logs.user_id IN (#{friends_ids})
         AND sleep_logs.created_at > datetime('now', '-7 day')
       GROUP BY sleep_logs.user_id
 
@@ -22,7 +23,7 @@ class User < ApplicationRecord
       FROM users
       LEFT JOIN sleep_logs
         ON users.id = sleep_logs.user_id
-      WHERE users.id IN (#{friends.ids.join(',')})
+      WHERE users.id IN (#{friends_ids})
         AND sleep_logs.id IS NULL
 
       ORDER BY duration DESC

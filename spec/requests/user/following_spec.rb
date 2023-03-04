@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe "User::Followings", type: :request do
+RSpec.describe "Users::Followings", type: :request do
   let!(:user) { create(:user) }
   let!(:friend) { create(:user) }
   let!(:second_friend) { create(:user) }
@@ -126,7 +126,7 @@ RSpec.describe "User::Followings", type: :request do
       end
     end
 
-    scenario 'should return sleep_logs of all friends only, ranked by length of sleep in descending order' do
+    scenario 'should return sleep_logs of all friends only, from last week only, ranked by length of sleep in descending order' do
       get '/user/followings/sleep_logs'
       expect(response_body.friends.size).to eq 4
 
@@ -143,7 +143,9 @@ RSpec.describe "User::Followings", type: :request do
         if friend == inactive_friend
           expect(sleep_logs.size).to eq 0
         else
-          expect(sleep_logs.map(&:created_at)).to eq sleep_logs.sort_by(&:created_at).reverse.map(&:created_at)
+          created_ats = sleep_logs.sort_by(&:created_at).reverse.map(&:created_at)
+          expect(sleep_logs.map(&:created_at)).to eq created_ats
+          expect(created_ats.last).to be > 1.week.ago
         end
       end
     end
