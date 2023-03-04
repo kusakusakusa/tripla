@@ -36,3 +36,7 @@
   - check if current user follows the target user
   - sleep records over past week, ordered by the length of their sleep, combine multiple sleep logs on the same day, determined by date of created_at
   - `GET /user/followings/sleep_logs`
+
+## Assumptions
+
+- Ignoring infinite sleeping hours scenarios where user forget to clock out

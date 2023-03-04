@@ -78,12 +78,14 @@ RSpec.describe "User::Followings", type: :request do
   describe 'GET /user/followings/sleep_logs' do
     let!(:less_sleep_friend) { friend }
     let!(:more_sleep_friend) { second_friend }
-    let!(:inactive_friend) { third_friend }
+    let!(:less_active_friend) { third_friend }
+    let!(:inactive_friend) { create(:user) }
     let!(:following_less_sleep_friend) { create(:following, friend: less_sleep_friend, user:) }
     let!(:following_more_sleep_friend) { create(:following, friend: more_sleep_friend, user:) }
-    let!(:following_third_friend) { create(:following, friend: inactive_friend, user:) }
+    let!(:following_less_active_friend) { create(:following, friend: less_active_friend, user:) }
+    let!(:following_inactive_friend) { create(:following, friend: inactive_friend, user:) }
 
-    let!(:following_stranger) { create(:following) }
+    let!(:following_stranger) { create(:following) } # control
 
     before :each do
       (21.days.ago.to_date..Date.today).to_a.each do |date|
@@ -110,7 +112,7 @@ RSpec.describe "User::Followings", type: :request do
         unless date.on_weekend?
           create(
             :sleep_log,
-            user: inactive_friend,
+            user: less_active_friend,
             created_at: date.to_time,
             wake_up_at: date.to_time + 4.hours # ensure less than less_sleep_friend
           )
@@ -126,17 +128,23 @@ RSpec.describe "User::Followings", type: :request do
 
     scenario 'should return sleep_logs of all friends only, ranked by length of sleep in descending order' do
       get '/user/followings/sleep_logs'
-      expect(response_body.friends.size).to eq 3
+      expect(response_body.friends.size).to eq 4
 
       [
         more_sleep_friend,
         less_sleep_friend,
+        less_active_friend,
         inactive_friend
       ].each_with_index do |friend, index|
         friend_json = response_body.friends[index]
         expect(friend_json.id).to eq friend.id
+
         sleep_logs = friend_json.sleep_logs
-        expect(sleep_logs.map(&:created_at)).to eq sleep_logs.sort_by(&:created_at).reverse.map(&:created_at)
+        if friend == inactive_friend
+          expect(sleep_logs.size).to eq 0
+        else
+          expect(sleep_logs.map(&:created_at)).to eq sleep_logs.sort_by(&:created_at).reverse.map(&:created_at)
+        end
       end
     end
   end
